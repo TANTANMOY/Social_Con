@@ -1,0 +1,8 @@
+body{
+    background-color: #211e1e;
+    background-image: url("https://www.transparenttextures.com/patterns/noisy-net.png");
+    color: rgba(255, 255, 255, 0.87);
+}
+
+/* transform: 'translateX(20%)' */
+/* objectFit: 'cover' */
