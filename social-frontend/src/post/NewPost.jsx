@@ -72,7 +72,7 @@ class NewPost extends Component {
   newPostForm = (title, body) => (
     <form>
       <div className="form-group">
-        <label className="text-muted">Profile Photo</label>
+        <label className="text-muted">Choose Photo</label>
         <input
           onChange={this.handleChange("photo")}
           type="file"
@@ -97,6 +97,7 @@ class NewPost extends Component {
           type="text"
           className="form-control"
           value={body}
+          rows="8"
         />
       </div>
 

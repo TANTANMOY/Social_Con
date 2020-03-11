@@ -4,7 +4,7 @@ import Posts from '../post/Posts'
 const Home =()=> (
         
     <div>
-    <div className="jumbotron">
+    <div className="jumbotron" style={{borderRadius: "0px"}}>
                 <h2 style={{color: "#262626"}}>Home </h2>
                 
             </div>
