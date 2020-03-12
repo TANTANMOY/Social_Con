@@ -11,7 +11,7 @@ import FindPeople from './user/FindPeople'
 import PrivateRoute from './auth/PrivateRoute'
 import NewPost from './post/NewPost'
 import SinglePost from './post/SinglePost'
-
+import EditPost from './post/EditPost'
  function MainRouter() {
     return (
         <div>
@@ -20,13 +20,14 @@ import SinglePost from './post/SinglePost'
                 <Route exact path="/" component={Home} />
                 <PrivateRoute exact path="/create/post" component={NewPost} />
                 <Route exact path="/post/:postId" component={SinglePost} />
+                <Route exact path="/post/edit/:postId" component={EditPost} />
                 <Route exact path="/users" component={Users} />
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/signin" component={Signin} />
                 <PrivateRoute exact path="/user/:userId" component={Profile} />
                 <PrivateRoute exact path="/user/edit/:userId" component={EditProfile} />
                 <PrivateRoute exact path="/findpeople" component={FindPeople} />
-             
+              
              
             </Switch>
         </div>

@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { isAuthenticated } from "../auth/index";
-import { read, update,updateUser } from "./apiUser";
+import { read, update, updateUser } from "./apiUser";
 import { Redirect } from "react-router-dom";
-import DefaultProfile from '../images/user.png'
-
+import DefaultProfile from "../images/user.png";
 
 class EditProfile extends Component {
   constructor() {
@@ -16,8 +15,8 @@ class EditProfile extends Component {
       redirectToProfile: false,
       error: "",
       loading: false,
-      fileSize:0,
-      about:''
+      fileSize: 0,
+      about: ""
     };
   }
   init = userId => {
@@ -43,31 +42,35 @@ class EditProfile extends Component {
   }
 
   isValid = () => {
-    const { name, email, password,fileSize } = this.state;
+    const { name, email, password, fileSize } = this.state;
 
-    if (fileSize >100000) {
+    if (fileSize > 100000) {
       this.setState({
-        error: "File size should be less than 100kb",  loading:false
+        error: "File size should be less than 100kb",
+        loading: false
       });
       return false;
     }
     if (name.length === 0) {
       this.setState({
-        error: "Name is required", loading:false
+        error: "Name is required",
+        loading: false
       });
       return false;
     }
 
     if (!/^\w+([\.-]?\w)*@\w+([\.-].-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       this.setState({
-        error: "A valid Email is required",loading:false
+        error: "A valid Email is required",
+        loading: false
       });
       return false;
     }
 
     if (password.length >= 1 && password.length <= 5) {
       this.setState({
-        error: "Password must be at least 6 characters long",loading:false
+        error: "Password must be at least 6 characters long",
+        loading: false
       });
       return false;
     }
@@ -75,34 +78,32 @@ class EditProfile extends Component {
   };
 
   handleChange = name => event => {
-    this.setState({error:""})
-    const value = name=== 'photo' ? event.target.files[0] : event.target.value
+    this.setState({ error: "" });
+    const value = name === "photo" ? event.target.files[0] : event.target.value;
 
-    const fileSize = name=== 'photo' ? event.target.files[0].size : 0;
-    this.userData.set(name,value)
-    this.setState({ [name]: value,fileSize });
+    const fileSize = name === "photo" ? event.target.files[0].size : 0;
+    this.userData.set(name, value);
+    this.setState({ [name]: value, fileSize });
   };
   clickSubmit = event => {
     event.preventDefault();
-    this.setState({loading:true})
+    this.setState({ loading: true });
     if (this.isValid()) {
-        
       const userId = this.props.match.params.userId;
       const token = isAuthenticated().token;
       update(userId, token, this.userData).then(data => {
         if (data.error) this.setState({ error: data.error });
         else
-        updateUser(data, () => {
-          this.setState({
-            redirectToProfile: true
+          updateUser(data, () => {
+            this.setState({
+              redirectToProfile: true
+            });
           });
-        })
-         
       });
     }
   };
 
-  EditForm = (name, email, password,about) => (
+  EditForm = (name, email, password, about) => (
     <form>
       <div className="form-group">
         <label className="text-muted">Profile Photo</label>
@@ -153,14 +154,27 @@ class EditProfile extends Component {
         update
       </button>
     </form>
-  )
+  );
 
   render() {
-    const { id, name, email, password, redirectToProfile, error,loading,about } = this.state;
+    const {
+      id,
+      name,
+      email,
+      password,
+      redirectToProfile,
+      error,
+      loading,
+      about
+    } = this.state;
     if (redirectToProfile) {
       return <Redirect to={`/user/${id}`} />;
     }
-    const photoUrl = id ? `${process.env.REACT_APP_API_URL}/user/photo/${id}?${new Date().getTime()}`:DefaultProfile
+    const photoUrl = id
+      ? `${
+          process.env.REACT_APP_API_URL
+        }/user/photo/${id}?${new Date().getTime()}`
+      : DefaultProfile;
 
     return (
       <div className="container">
@@ -171,12 +185,19 @@ class EditProfile extends Component {
         >
           {error}
         </div>
-        {
-           loading ? (<div className="jumbotron text-center">Loading....</div>) : ("")
-       }
+        {loading ? (
+          <div className="jumbotron text-center">Loading....</div>
+        ) : (
+          ""
+        )}
 
-       <img style={{height: "200px",width: 'auto'}}  src={photoUrl}  onError={i=> (i.target.src= `${DefaultProfile}`)} alt={name}/>
-        {this.EditForm(name, email, password,about)}
+        <img
+          style={{ height: "200px", width: "auto" }}
+          src={photoUrl}
+          onError={i => (i.target.src = `${DefaultProfile}`)}
+          alt={name}
+        />
+        {this.EditForm(name, email, password, about)}
       </div>
     );
   }

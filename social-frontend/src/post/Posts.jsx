@@ -36,7 +36,7 @@ class Posts extends Component {
                   src={`${process.env.REACT_APP_API_URL}/post/photo/${post._id}`}
                   onError={i => (i.target.src = `${DefaultProfile}`)}
                   alt={post.title}
-                  style={{ width: "100%", height: "15vw", objectFit: "cover" }}
+                  style={{ width: "100%", height: "200px", objectFit: "cover" }}
                 />
 
                 <div className="card-body">

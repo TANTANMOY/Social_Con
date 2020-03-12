@@ -70,7 +70,7 @@ const updateUser = (req,res,next) => {
         user.save((err, result) => {
             if(err){
                 return res.status(400).json({
-                    error: er
+                    error: err
                 })
             }
             user.hashed_password = undefined
