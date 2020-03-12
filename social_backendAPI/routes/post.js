@@ -1,5 +1,5 @@
 import express from 'express'
-import {getPosts, createPost,postsByUser,postById,isPoster,deletePost,updatePost,photo,singlePost,like,unlike} from '../controllers/post'
+import {getPosts, createPost,postsByUser,postById,isPoster,deletePost,updatePost,photo,singlePost,like,unlike,comment,uncomment} from '../controllers/post'
 import createPostValidator from '../validator'
 import {requireSignin} from '../controllers/auth'
 import {userById, deleteUser} from '../controllers/user'
@@ -12,6 +12,11 @@ router.get('/posts',getPosts);
 //like unlike
 router.put('/post/like',requireSignin,like);
 router.put('/post/unlike',requireSignin,unlike);
+//comments
+
+router.put('/post/comment',requireSignin,comment);
+router.put('/post/uncomment',requireSignin,uncomment);
+
 router.post('/post/new/:userId', requireSignin,createPost,createPostValidator);
 router.get('/post/by/:userId',postsByUser);
 router.get('/post/:postId',singlePost);
