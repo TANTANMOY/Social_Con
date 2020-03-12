@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { singlePost, remove } from "./apiPost";
+import { singlePost, remove, like, unlike } from "./apiPost";
 import DefaultProfile from "../images/posts.jpg";
 import { Link, Redirect } from "react-router-dom";
 import { isAuthenticated } from "../auth";
@@ -7,7 +7,15 @@ class SinglePost extends Component {
   state = {
     post: "",
     deleted: false,
-    redirectToHome: false
+    redirectToHome: false,
+    redirectToSignin: false,
+    like: false,
+    likes: 0
+  };
+  checkLike = likes => {
+    const userId =isAuthenticated() && isAuthenticated().user._id;
+    let match = likes.indexOf(userId) !== -1;
+    return match;
   };
 
   componentDidMount = () => {
@@ -16,10 +24,36 @@ class SinglePost extends Component {
       if (data.error) {
         console.log(data.error);
       } else {
-        this.setState({ post: data });
+        this.setState({
+          post: data,
+          likes: data.likes.length,
+          like: this.checkLike(data.likes)
+        });
       }
     });
   };
+  
+  likeToggle = () => {
+    if(!isAuthenticated()) {
+      this.setState({redirectToSignin: true})
+      return false
+    }
+    let callAPi = this.state.like ? unlike : like;
+    const userId = isAuthenticated().user._id;
+    const postId = this.state.post._id;
+    const token = isAuthenticated().token;
+    callAPi(userId, token, postId).then(data => {
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        this.setState({
+          like: !this.state.like,
+          likes: data.likes.length
+        });
+      }
+    });
+  };
+
   deletePost = () => {
     const postId = this.props.match.params.postId;
     const token = isAuthenticated().token;
@@ -45,6 +79,8 @@ class SinglePost extends Component {
     const posterId = post.postedBy ? `/user/${post.postedBy._id}` : " ";
     const posterName = post.postedBy ? post.postedBy.name : " Unknown";
 
+    const { like, likes } = this.state;
+
     return (
       <div className="card">
         <div className="card-body">
@@ -55,6 +91,17 @@ class SinglePost extends Component {
             alt={post.title}
             style={{ width: "auto", height: "300px" }}
           />
+
+        {like ? ( <h3 className="text-dark mt-2" onClick={this.likeToggle}>
+      
+      {likes} <i className="fa fa-thumbs-up text-success "></i>
+    </h3>) : (
+       <h3 className="text-dark mt-2" onClick={this.likeToggle}>
+      
+       {likes} <i className="fa fa-thumbs-down text-warning "></i>
+     </h3>
+    ) }
+         
 
           <div className="card-body">
             <p className="card-text text-dark">{post.body}</p>
@@ -71,9 +118,12 @@ class SinglePost extends Component {
               {isAuthenticated().user &&
                 isAuthenticated().user._id === post.postedBy._id && (
                   <>
-                       <Link to={`/post/edit/${post._id}`} className="btn btn-raised btn-sm btn-success ml-2">
-                Update Post
-              </Link>
+                    <Link
+                      to={`/post/edit/${post._id}`}
+                      className="btn btn-raised btn-sm btn-success ml-2"
+                    >
+                      Update Post
+                    </Link>
                     <button
                       onClick={this.deleteConfirmed}
                       className="btn btn-raised btn-warning btn-sm ml-2"
@@ -89,10 +139,14 @@ class SinglePost extends Component {
     );
   };
   render() {
+   
+    const { post,redirectToHome,redirectToSignin } = this.state;
     if (this.state.redirectToHome) {
       return <Redirect to={`/`} />;
+    }else if(redirectToSignin)
+    {
+      return <Redirect to={`/signin`} />;
     }
-    const { post } = this.state;
     return (
       <div className="container">
         <h2 className=" mt-2 mb-2">{post.title}</h2>

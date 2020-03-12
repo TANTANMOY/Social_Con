@@ -25,7 +25,7 @@ const getPosts= (req,res) => {
    
   Post.find()
   .populate("postedBy","_id name")
-  .select("_id title body created")
+  .select("_id title body created likes")
   .sort({created: -1})
   .then(posts=> {
       res.json(posts)
@@ -70,6 +70,7 @@ const createPost = (req,res)=> {
 const postsByUser = (req,res) => {
     Post.find({postedBy: req.profile._id})
     .populate("postedBy", "_id name")
+    .select("_id title body created likes")
     .sort("_created")
     .exec((err,posts) => {
         if(err) {
@@ -166,6 +167,32 @@ const singlePost =(req,res) => {
     return res.json(req.post)
 }
 
+const like = (req,res) => {
+    Post.findByIdAndUpdate(req.body.postId, {$push: {likes: req.body.userId}},
+        {new: true} 
+        ).exec((err,result) => {
+            if(err) {
+                return res.status(400).json({
+                    error: err
+                })
+            }else {
+                res.json(result)
+            }
+        })
+}
 
+const unlike = (req,res) => {
+    Post.findByIdAndUpdate(req.body.postId, {$pull: {likes: req.body.userId}},
+        {new: true} 
+        ).exec((err,result) => {
+            if(err) {
+                return res.status(400).json({
+                    error: err
+                })
+            }else {
+                res.json(result)
+            }
+        })
+}
 
-export {getPosts,createPost,postsByUser,postById,isPoster,deletePost,updatePost,photo,singlePost}
+export {getPosts,createPost,postsByUser,postById,isPoster,deletePost,updatePost,photo,singlePost,like,unlike}
