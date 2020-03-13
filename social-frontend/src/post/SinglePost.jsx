@@ -1,8 +1,11 @@
 import React, { Component } from "react";
-import { singlePost, remove, like, unlike } from "./apiPost";
-import DefaultProfile from "../images/posts.jpg";
+import { singlePost, remove, like, unlike, comment } from "./apiPost";
+import DefaultPost from "../images/posts.jpg";
 import { Link, Redirect } from "react-router-dom";
 import { isAuthenticated } from "../auth";
+import Comment from './Comment'
+
+
 class SinglePost extends Component {
   state = {
     post: "",
@@ -10,7 +13,8 @@ class SinglePost extends Component {
     redirectToHome: false,
     redirectToSignin: false,
     like: false,
-    likes: 0
+    likes: 0,
+    comments:[]
   };
   checkLike = likes => {
     const userId =isAuthenticated() && isAuthenticated().user._id;
@@ -27,12 +31,17 @@ class SinglePost extends Component {
         this.setState({
           post: data,
           likes: data.likes.length,
-          like: this.checkLike(data.likes)
+          like: this.checkLike(data.likes),
+          comments: data.comments
         });
       }
     });
   };
   
+  updateComments = comments => {
+    this.setState({comments})
+  }
+
   likeToggle = () => {
     if(!isAuthenticated()) {
       this.setState({redirectToSignin: true})
@@ -68,7 +77,7 @@ class SinglePost extends Component {
 
   deleteConfirmed = () => {
     let answer = window.confirm(
-      "Are you sure you want to delete your account?"
+      "Are you sure you want to delete your post?"
     );
     if (answer) {
       this.deletePost();
@@ -87,7 +96,7 @@ class SinglePost extends Component {
           <img
             className="card-img-top"
             src={`${process.env.REACT_APP_API_URL}/post/photo/${post._id}`}
-            onError={i => (i.target.src = `${DefaultProfile}`)}
+            onError={i => (i.target.src = `${DefaultPost}`)}
             alt={post.title}
             style={{ width: "auto", height: "300px" }}
           />
@@ -140,7 +149,7 @@ class SinglePost extends Component {
   };
   render() {
    
-    const { post,redirectToHome,redirectToSignin } = this.state;
+    const{post,redirectToHome,redirectToSignin,comments} = this.state;
     if (this.state.redirectToHome) {
       return <Redirect to={`/`} />;
     }else if(redirectToSignin)
@@ -156,6 +165,7 @@ class SinglePost extends Component {
         ) : (
           this.renderPost(post)
         )}
+        <Comment postId={post._id} comments={comments.reverse()} updateComments={this.updateComments}/>
       </div>
     );
   }

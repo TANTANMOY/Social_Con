@@ -5,9 +5,8 @@ import _ from 'lodash'
 
 const postById = (req,res,next,id) => {
     Post.findById(id)
-    .populate("postedBy", "_id name")
-    .populate("comments","text created")
-    .populate("comments.postedBy","_id name")
+    .populate("postedBy","_id name")
+	.populate("comments.postedBy", "_id name")
     .exec((err,post) => {
         if(err || !post) {
             return res.status(400).json({
@@ -24,18 +23,18 @@ const postById = (req,res,next,id) => {
 
 
 const getPosts= (req,res) => {
-   
-  Post.find()
-  .populate("postedBy","_id name")
-  .populate("comments","text created")
-  .populate("comments.postedBy","_id name")
-  .select("_id title body created likes")
-  .sort({created: -1})
-  .then(posts=> {
-      res.json(posts)
-  })
-.catch(err=> console.log(err))
-}
+    Post.find()
+    .populate("postedBy", "_id name")
+    .populate("comments", "text created")
+    .populate("comments.postedBy" , "_id name")
+    .select("_id title body created likes")
+     .sort({ created: -1})
+    .then((posts)=>{
+        res.json(posts);
+    })
+    .catch(err => console.log(err));
+    };
+     
 
 
 const createPost = (req,res)=> {
@@ -205,7 +204,7 @@ const comment = (req,res) => {
     Post.findByIdAndUpdate(req.body.postId, {$push: {comments: comment}},
         {new: true} 
         )
-        .populate('commets.postedBy', '_id name')
+        .populate('comments.postedBy', '_id name')
         .populate('postedBy', '_id name')
         .exec((err,result) => {
             if(err) {
@@ -224,7 +223,10 @@ const uncomment = (req,res) => {
 
     Post.findByIdAndUpdate(req.body.postId, {$pull: {comments: {_id: comment._id}}},
         {new: true} 
-        ).exec((err,result) => {
+        )
+        .populate('comments.postedBy', '_id name')
+        .populate('postedBy', '_id name')
+        .exec((err,result) => {
             if(err) {
                 return res.status(400).json({
                     error: err
